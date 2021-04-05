@@ -53,9 +53,10 @@ class HomingMove:
         kin = self.toolhead.get_kinematics()
         kin_spos = {s.get_name(): s.get_commanded_position()
                     for s in kin.get_steppers()}
-        start_mcu_pos = [(s, name, s.get_mcu_position())
-                         for es, name in self.endstops
-                         for s in es.get_steppers()]
+        start_mcu_pos = [
+            (s, es, name, s.get_mcu_position(), s.get_commanded_position())
+            for es, name in self.endstops
+            for s in es.get_steppers() ]
         # Start endstop checking
         print_time = self.toolhead.get_last_move_time()
         endstop_triggers = []
@@ -74,24 +75,45 @@ class HomingMove:
         except self.printer.command_error as e:
             error = "Error during homing move: %s" % (str(e),)
         # Wait for endstops to trigger
+        trigger_times = {}
         move_end_print_time = self.toolhead.get_last_move_time()
         for mcu_endstop, name in self.endstops:
             trigger_time = mcu_endstop.home_wait(move_end_print_time)
-            if trigger_time < 0. and error is None:
+            if trigger_time > 0.:
+                trigger_times[mcu_endstop] = trigger_time
+            elif trigger_time < 0. and error is None:
                 error = "Communication timeout during homing %s" % (name,)
-            elif not trigger_time and check_triggered and error is None:
+            elif check_triggered and error is None:
                 error = "No trigger on %s after full movement" % (name,)
         # Determine stepper halt positions
         self.toolhead.flush_step_generation()
-        self.end_mcu_pos = [(s, name, spos, s.get_mcu_position())
-                            for s, name, spos in start_mcu_pos]
+        self.end_mcu_pos = [
+            (s, es, name, spos, cpos, s.get_mcu_position(),
+             s.get_past_mcu_position(trigger_times.get(es,
+                                                       move_end_print_time)))
+             for s, es, name, spos, cpos in start_mcu_pos]
         if probe_pos:
-            for s, name, spos, epos in self.end_mcu_pos:
+            for s, es, name, spos, cpos, epos, tpos in self.end_mcu_pos:
                 sname = s.get_name()
                 if sname in kin_spos:
-                    kin_spos[sname] += (epos - spos) * s.get_step_dist()
-            movepos = list(kin.calc_position(kin_spos))[:3] + movepos[3:]
-        self.toolhead.set_position(movepos)
+                    kin_spos[sname] = cpos + (tpos - spos) * s.get_step_dist()
+            trigpos = list(kin.calc_position(kin_spos))[:3] + movepos[3:]
+            for s, es, name, spos, cpos, epos, tpos in self.end_mcu_pos:
+                sname = s.get_name()
+                if sname in kin_spos:
+                    kin_spos[sname] = cpos + (epos - spos) * s.get_step_dist()
+            endpos = list(kin.calc_position(kin_spos))[:3] + movepos[3:]
+        else:
+            trigpos = movepos
+            self.toolhead.set_position(movepos)
+            # XXX - only calc new position if there is overshoot
+            for s, es, name, spos, cpos, epos, tpos in self.end_mcu_pos:
+                sname = s.get_name()
+                if sname in kin_spos:
+                    npos = s.get_commanded_position()
+                    kin_spos[sname] = npos + (epos - tpos) * s.get_step_dist()
+            endpos = list(kin.calc_position(kin_spos))[:3] + movepos[3:]
+        self.toolhead.set_position(endpos)
         # Signal homing/probing move complete
         try:
             self.printer.send_event("homing:homing_move_end", self)
@@ -100,12 +122,12 @@ class HomingMove:
                 error = str(e)
         if error is not None:
             raise self.printer.command_error(error)
-        return movepos
+        return trigpos
     def check_no_movement(self):
         if self.printer.get_start_args().get('debuginput') is not None:
             return None
-        for s, name, spos, epos in self.end_mcu_pos:
-            if spos == epos:
+        for s, es, name, spos, cpos, epos, tpos in self.end_mcu_pos:
+            if spos == tpos:
                 return name
         return None
 
@@ -166,6 +188,7 @@ class Homing:
         # Signal home operation complete
         self.toolhead.flush_step_generation()
         kin = self.toolhead.get_kinematics()
+        # XXX - endstop_phases need update to use trigger pos
         kin_spos = {s.get_name(): s.get_commanded_position()
                     for s in kin.get_steppers()}
         self.kin_spos = dict(kin_spos)
