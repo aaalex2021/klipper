@@ -31,6 +31,7 @@ choice
     config MACH_STM32F207
         bool "STM32F207"
         select MACH_STM32F2
+	select HAVE_STM32F2_FSMC
     config MACH_STM32F401
         bool "STM32F401"
         select MACH_STM32F4
@@ -74,6 +75,9 @@ config HAVE_STM32_USBOTG
 config HAVE_STM32_CANBUS
     bool
     default y if MACH_STM32F1 || MACH_STM32F2 || MACH_STM32F4 || MACH_STM32F042
+config HAVE_STM32F2_FSMC
+    bool
+    default y if MACH_STM32F2
 
 config MCU
     string
