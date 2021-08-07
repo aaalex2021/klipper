@@ -75,19 +75,6 @@ void enable_i8080_fsmc(uint32_t cs_pin, uint32_t rs_pin)
     writeTiming.FSMC_AccessMode = FSMC_AccessMode_A;
     // Mode A
 
-/* #define FSMC_Bank1_NORSRAM1                      ((uint32_t)0x00000000) */
-/* #define FSMC_DataAddressMux_Disable                ((uint32_t)0x00000000) */
-/* #define FSMC_MemoryType_NOR                      ((uint32_t)0x00000008) */
-/* #define FSMC_MemoryDataWidth_16b                 ((uint32_t)0x00000010) */
-/* #define FSMC_BurstAccessMode_Disable             ((uint32_t)0x00000000) */
-/* #define FSMC_WaitSignalPolarity_Low              ((uint32_t)0x00000000) */
-/* #define FSMC_WrapMode_Disable                    ((uint32_t)0x00000000) */
-/* #define FSMC_AsynchronousWait_Disable            ((uint32_t)0x00000000) */
-/* #define FSMC_WaitSignalActive_BeforeWaitState    ((uint32_t)0x00000000) */
-/* #define FSMC_WaitSignal_Disable                  ((uint32_t)0x00000000) */
-/* #define FSMC_WriteBurst_Disable                  ((uint32_t)0x00000000) */
-/* #define FSMC_WriteOperation_Enable                      ((uint32_t)0x00001000) */
-
     FSMC_NORSRAMInitStructure.FSMC_Bank = FSMC_Bank1_NORSRAM1;
     // Select the address of the external storage area
     FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
@@ -167,5 +154,14 @@ i8080_fsmc_rd_data(void)
     volatile uint16_t ram;
     ram = LCD->LCD_RAM;
     return ram;
+}
+
+void i8080_fsmc_rd_multi_data(uint16_t cmd, uint16_t *pdata, uint32_t cnt)
+{
+    i8080_fsmc_wr_reg(cmd);
+    while(cnt--) {
+	*pdata = i8080_fsmc_rd_data();
+	pdata++;
+    }
 }
 
