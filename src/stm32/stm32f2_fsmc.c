@@ -51,7 +51,7 @@ void enable_i8080_fsmc(uint32_t cs_pin, uint32_t rs_pin)
 
     // start FSMC clock
     RCC->AHB3ENR |= RCC_AHB3Periph_FSMC;
-  
+
     //#define FSMC_AccessMode_A                        ((uint32_t)0x00000000)
 
     readWriteTiming.FSMC_AddressSetupTime = 0x01;

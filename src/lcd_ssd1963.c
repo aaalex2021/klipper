@@ -101,7 +101,7 @@ command_i8080_fill(uint32_t *args)
     /* LCD_WR_DATA(sy>>8);LCD_WR_DATA(sy&0xFF); */
     /* LCD_WR_DATA(ey>>8);LCD_WR_DATA(ey&0xFF); */
     /* LCD_WR_REG(0x2C);  // Ready to write memory */
-    
+
     i8080_fsmc_wr_reg(0x2A);
     i8080_fsmc_wr_data(sx>>8);i8080_fsmc_wr_data(sx&0xFF);
     i8080_fsmc_wr_data(ex>>8);i8080_fsmc_wr_data(ex&0xFF);
@@ -116,7 +116,7 @@ command_i8080_fill(uint32_t *args)
         //      LCD_WR_DATA(0x0760);
         i8080_fsmc_wr_data(0x0760);
     }
-      
+
     sendf("i8080_fill_done");
 }
 DECL_COMMAND(command_i8080_fill, "i8080_fill oid=%c fact=%c");
