@@ -31,7 +31,7 @@ choice
     config MACH_STM32F207
         bool "STM32F207"
         select MACH_STM32F2
-	select HAVE_STM32F2_FSMC
+        select HAVE_STM32F2_FSMC
     config MACH_STM32F401
         bool "STM32F401"
         select MACH_STM32F4

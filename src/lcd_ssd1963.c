@@ -53,8 +53,9 @@ command_i8080_read_data(uint32_t *args)
 
     uint8_t cmd = args[1], cnt = args[2];
     i8080_fsmc_rd_multi_data(cmd, &dt[0], cnt);
-    sendf("i8080_read_data_out c=%c d1=%c d2=%c d3=%c d4=%c d5=%c d6=%c d7=%c d8=%c", cmd,
-	  dt[0], dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[7]);
+    sendf("i8080_read_data_out c=%c d1=%c d2=%c d3=%c d4=%c " + \
+          "d5=%c d6=%c d7=%c d8=%c",
+          cmd, dt[0], dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[7]);
 }
 DECL_COMMAND(command_i8080_read_data, "i8080_read_data oid=%c cmd=%c cnt=%c");
 
@@ -75,10 +76,11 @@ command_i8080_send_cmd_param(uint32_t *args)
     i8080_fsmc_wr_reg(args[1]);
 
     while (--count) {
-	i8080_fsmc_wr_data((*data++));
+        i8080_fsmc_wr_data((*data++));
     }
 }
-DECL_COMMAND(command_i8080_send_cmd_param, "i8080_send_cmd_param oid=%c cmd=%c param=%*s");
+DECL_COMMAND(command_i8080_send_cmd_param,
+             "i8080_send_cmd_param oid=%c cmd=%c param=%*s");
 
 
 void
@@ -109,10 +111,10 @@ command_i8080_fill(uint32_t *args)
     i8080_fsmc_wr_reg(0x2C);  // Ready to write memory
 
     for (index=0; index<fact*fact; index++) {
-	//	LCD_WR_DATA(0x00DF);
-	//	LCD_WR_DATA(fact);
-	//	LCD_WR_DATA(0x0760);
-	i8080_fsmc_wr_data(0x0760);
+        //      LCD_WR_DATA(0x00DF);
+        //      LCD_WR_DATA(fact);
+        //      LCD_WR_DATA(0x0760);
+        i8080_fsmc_wr_data(0x0760);
     }
       
     sendf("i8080_fill_done");

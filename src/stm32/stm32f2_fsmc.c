@@ -84,14 +84,18 @@ void enable_i8080_fsmc(uint32_t cs_pin, uint32_t rs_pin)
     FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
     // Set the data width of the FSMC interface
 
-    FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
+    FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = \
+        FSMC_BurstAccessMode_Disable;
     // Configure access mode
-    FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
+    FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = \
+        FSMC_WaitSignalPolarity_Low;
     // Configure the polarity of the wait signal
     FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
     // Configure whether to use non-alignment
-    FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;
-    FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
+    FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = \
+        FSMC_AsynchronousWait_Disable;
+    FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = \
+        FSMC_WaitSignalActive_BeforeWaitState;
     // Configure when to wait for signals
     FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
     // Configure whether to use wait signals
@@ -120,7 +124,8 @@ typedef struct
 } LCD_TypeDef;
 
 // TODO: derive LCD_BASE from RS pin
-#define LCD_BASE        ((uint32_t)(0x60000000 | 0x00FFFFFE))  // 1111 1111 1111 1111 1111 1110
+// 1111 1111 1111 1111 1111 1110
+#define LCD_BASE        ((uint32_t)(0x60000000 | 0x00FFFFFE))
 #define LCD             ((LCD_TypeDef *) LCD_BASE)
 
 //#define LCD_WR_REG(regval) do{ LCD->LCD_REG = regval; }while(0)
@@ -160,8 +165,7 @@ void i8080_fsmc_rd_multi_data(uint16_t cmd, uint16_t *pdata, uint32_t cnt)
 {
     i8080_fsmc_wr_reg(cmd);
     while(cnt--) {
-	*pdata = i8080_fsmc_rd_data();
-	pdata++;
+        *pdata = i8080_fsmc_rd_data();
+        pdata++;
     }
 }
-
