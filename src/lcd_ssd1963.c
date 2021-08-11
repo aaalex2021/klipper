@@ -1,6 +1,7 @@
-// Commands for sending messages to an ssd1963 lcd driver
+// Commands for sending messages to an LCD connected over i8080 protocol
 //
 // Copyright (C) 2018  Kevin O'Connor <kevin@koconnor.net>
+// Copyright (C) 2021  Alex Peuchert  <alex2021@ki2s.com>
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 
@@ -18,16 +19,6 @@ struct i8080 {
     struct gpio_out bl;
     uint32_t cs, rs;
 };
-
-
-/****************************************************************
- * Init functions
- ****************************************************************/
-
-
-/****************************************************************
- * Transmit functions
- ****************************************************************/
 
 /****************************************************************
  * Interface
@@ -53,7 +44,7 @@ command_i8080_read_data(uint32_t *args)
 
     uint8_t cmd = args[1], cnt = args[2];
     i8080_fsmc_rd_multi_data(cmd, &dt[0], cnt);
-    sendf("i8080_read_data_out c=%c d1=%c d2=%c d3=%c d4=%c " + \
+    sendf("i8080_read_data_out c=%c d1=%c d2=%c d3=%c d4=%c " \
           "d5=%c d6=%c d7=%c d8=%c",
           cmd, dt[0], dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[7]);
 }
@@ -69,18 +60,35 @@ DECL_COMMAND(command_i8080_send_cmd, "i8080_send_cmd oid=%c cmd=%c");
 
 
 void
-command_i8080_send_cmd_param(uint32_t *args)
+command_i8080_send_cmd_param8(uint32_t *args)
 {
-    uint16_t count = args[2], *data = command_decode_ptr(args[3]);
+    uint8_t count = args[2], *data = command_decode_ptr(args[3]);
 
     i8080_fsmc_wr_reg(args[1]);
 
-    while (--count) {
+    while (count--) {
         i8080_fsmc_wr_data((*data++));
     }
 }
-DECL_COMMAND(command_i8080_send_cmd_param,
-             "i8080_send_cmd_param oid=%c cmd=%c param=%*s");
+DECL_COMMAND(command_i8080_send_cmd_param8,
+             "i8080_send_cmd_param8 oid=%c cmd=%c param=%*s");
+
+
+void
+command_i8080_send_cmd_data16(uint32_t *args)
+{
+    uint8_t count = args[2]/2, *data = command_decode_ptr(args[3]);
+    
+    i8080_fsmc_wr_reg(args[1]);
+
+    while (count--) {
+        uint16_t d = ((*data) << 8) | (*(data+1));
+        data+=2;
+        i8080_fsmc_wr_data(d);
+    }
+}
+DECL_COMMAND(command_i8080_send_cmd_data16,
+             "i8080_send_cmd_data16 oid=%c cmd=%c data=%*s");
 
 
 void
