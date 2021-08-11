@@ -75,11 +75,11 @@ DECL_COMMAND(command_i8080_send_cmd_param8,
 
 
 void
-command_i8080_send_cmd_data16(uint32_t *args)
+command_i8080_send_data16(uint32_t *args)
 {
-    uint8_t count = args[2]/2, *data = command_decode_ptr(args[3]);
+    uint8_t count = args[1]/2, *data = command_decode_ptr(args[2]);
     
-    i8080_fsmc_wr_reg(args[1]);
+    //    i8080_fsmc_wr_reg(args[1]);
 
     while (count--) {
         uint16_t d = ((*data) << 8) | (*(data+1));
@@ -87,8 +87,8 @@ command_i8080_send_cmd_data16(uint32_t *args)
         i8080_fsmc_wr_data(d);
     }
 }
-DECL_COMMAND(command_i8080_send_cmd_data16,
-             "i8080_send_cmd_data16 oid=%c cmd=%c data=%*s");
+DECL_COMMAND(command_i8080_send_data16,
+             "i8080_send_data16 oid=%c data=%*s");
 
 
 void
