@@ -104,8 +104,9 @@ void enable_i8080_fsmc(uint32_t cs_pin, uint32_t rs_pin, uint8_t dstime)
     FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM1, ENABLE);
 
     if( (rs_pin == GPIO('E', 2)) && (cs_pin == GPIO('D', 7)) )
-        i8080_access = ((i8080_access_struct *)((uint32_t)(0x60000000 | 0x00FFFFFE)));
-    else 
+        i8080_access =
+            ((i8080_access_struct *)((uint32_t)(0x60000000 | 0x00FFFFFE)));
+    else
         shutdown("stm32f2_fsmc: only RS on PE2 and CS on PD7 is supported.");
 }
 
