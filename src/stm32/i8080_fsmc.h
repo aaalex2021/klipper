@@ -3,7 +3,7 @@
 
 #include <stdint.h> // uint32_t
 
-void enable_i8080_fsmc(uint32_t cs_pin, uint32_t rs_pin);
+void enable_i8080_fsmc(uint32_t cs_pin, uint32_t rs_pin, uint8_t dstime);
 void i8080_fsmc_wr_reg(uint16_t cmd);
 void i8080_fsmc_wr_data(uint16_t data);
 uint16_t i8080_fsmc_rd_data(void);

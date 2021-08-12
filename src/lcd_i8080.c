@@ -24,6 +24,8 @@ struct i8080 {
  * Interface
  ****************************************************************/
 
+#define TFTLCD_DRIVER_SPEED 0x10
+
 void
 command_config_i8080(uint32_t *args)
 {
@@ -32,7 +34,7 @@ command_config_i8080(uint32_t *args)
     s->cs = GPIO('D', 7);
     s->rs = GPIO('E', 2);
 
-    enable_i8080_fsmc(s->cs, s->rs);
+    enable_i8080_fsmc(s->cs, s->rs, TFTLCD_DRIVER_SPEED);
 }
 DECL_COMMAND(command_config_i8080, "config_i8080 oid=%c");
 
@@ -78,8 +80,6 @@ void
 command_i8080_send_data16(uint32_t *args)
 {
     uint8_t count = args[1]/2, *data = command_decode_ptr(args[2]);
-    
-    //    i8080_fsmc_wr_reg(args[1]);
 
     while (count--) {
         uint16_t d = ((*data) << 8) | (*(data+1));
@@ -102,14 +102,6 @@ command_i8080_fill(uint32_t *args)
     uint16_t ex = fact*2;
     uint16_t ey = fact*2;
 
-    /* LCD_WR_REG(0x2A); */
-    /* LCD_WR_DATA(sx>>8);LCD_WR_DATA(sx&0xFF); */
-    /* LCD_WR_DATA(ex>>8);LCD_WR_DATA(ex&0xFF); */
-    /* LCD_WR_REG(0x2B); */
-    /* LCD_WR_DATA(sy>>8);LCD_WR_DATA(sy&0xFF); */
-    /* LCD_WR_DATA(ey>>8);LCD_WR_DATA(ey&0xFF); */
-    /* LCD_WR_REG(0x2C);  // Ready to write memory */
-
     i8080_fsmc_wr_reg(0x2A);
     i8080_fsmc_wr_data(sx>>8);i8080_fsmc_wr_data(sx&0xFF);
     i8080_fsmc_wr_data(ex>>8);i8080_fsmc_wr_data(ex&0xFF);
@@ -119,10 +111,8 @@ command_i8080_fill(uint32_t *args)
     i8080_fsmc_wr_reg(0x2C);  // Ready to write memory
 
     for (index=0; index<fact*fact; index++) {
-        //      LCD_WR_DATA(0x00DF);
-        //      LCD_WR_DATA(fact);
-        //      LCD_WR_DATA(0x0760);
-        i8080_fsmc_wr_data(0x0760);
+        //        i8080_fsmc_wr_data(0x0760);
+        i8080_fsmc_wr_data(0x001F);
     }
 
     sendf("i8080_fill_done");
