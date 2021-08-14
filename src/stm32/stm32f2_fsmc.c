@@ -1,7 +1,7 @@
 // STM32F2 FSMC support
 //
 // Copyright (C) 2019  Kevin O'Connor <kevin@koconnor.net>
-// Copyright (C) 2021  Alex Peuchert  <alex2021@ki2s.com>
+// Copyright (C) 2021  Alex Peuchert  <aaalex2021@ki2s.com>
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 

@@ -1,7 +1,7 @@
 // Commands for sending messages to an LCD connected over i8080 protocol
 //
 // Copyright (C) 2018  Kevin O'Connor <kevin@koconnor.net>
-// Copyright (C) 2021  Alex Peuchert  <alex2021@ki2s.com>
+// Copyright (C) 2021  Alex Peuchert  <aaalex2021@ki2s.com>
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 
@@ -16,7 +16,7 @@
 #include "board/i8080_fsmc.h"
 
 struct i8080 {
-    struct gpio_out bl;
+    //    struct gpio_out bl;
     uint32_t cs, rs;
 };
 
@@ -30,7 +30,7 @@ void
 command_config_i8080(uint32_t *args)
 {
     struct i8080 *s = oid_alloc(args[0], command_config_i8080, sizeof(*s));
-    s->bl = gpio_out_setup(GPIO('D', 12), 1);
+    //    s->bl = gpio_out_setup(GPIO('D', 12), 1);
     s->cs = GPIO('D', 7);
     s->rs = GPIO('E', 2);
 
