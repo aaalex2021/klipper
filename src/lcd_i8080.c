@@ -94,30 +94,27 @@ DECL_COMMAND(command_i8080_send_data16,
 void
 command_i8080_fill(uint32_t *args)
 {
-    uint32_t index=0;
-    uint16_t fact = args[1];
+    uint32_t color = args[1];
+    uint32_t index = args[2];
 
-    uint16_t sx = fact;
-    uint16_t sy = fact;
-    uint16_t ex = fact*2;
-    uint16_t ey = fact*2;
+    /* uint16_t sx = args[1]; */
+    /* uint16_t sy = args[2]; */
+    /* uint16_t ex = sx + args[3] - 1; */
+    /* uint16_t ey = sy + args[4] - 1; */
 
-    i8080_fsmc_wr_reg(0x2A);
-    i8080_fsmc_wr_data(sx>>8);i8080_fsmc_wr_data(sx&0xFF);
-    i8080_fsmc_wr_data(ex>>8);i8080_fsmc_wr_data(ex&0xFF);
-    i8080_fsmc_wr_reg(0x2B);
-    i8080_fsmc_wr_data(sy>>8);i8080_fsmc_wr_data(sy&0xFF);
-    i8080_fsmc_wr_data(ey>>8);i8080_fsmc_wr_data(ey&0xFF);
-    i8080_fsmc_wr_reg(0x2C);  // Ready to write memory
+    /* i8080_fsmc_wr_reg(0x2A); */
+    /* i8080_fsmc_wr_data(sx>>8);i8080_fsmc_wr_data(sx&0xFF); */
+    /* i8080_fsmc_wr_data(ex>>8);i8080_fsmc_wr_data(ex&0xFF); */
+    /* i8080_fsmc_wr_reg(0x2B); */
+    /* i8080_fsmc_wr_data(sy>>8);i8080_fsmc_wr_data(sy&0xFF); */
+    /* i8080_fsmc_wr_data(ey>>8);i8080_fsmc_wr_data(ey&0xFF); */
+    /* i8080_fsmc_wr_reg(0x2C);  // Ready to write memory */
 
-    for (index=0; index<fact*fact; index++) {
-        //        i8080_fsmc_wr_data(0x0760);
-        i8080_fsmc_wr_data(0x001F);
+    for (; index>0; index--) {
+        i8080_fsmc_wr_data(color);
     }
-
-    sendf("i8080_fill_done");
 }
-DECL_COMMAND(command_i8080_fill, "i8080_fill oid=%c fact=%c");
+DECL_COMMAND(command_i8080_fill, "i8080_send_fill oid=%c color=%c count=%c");
 
 
 void
