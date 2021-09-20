@@ -19,10 +19,12 @@ class SSD1963(textframebuffer.TextFrameBuffer):
     def __init__(self, config):
         self.width = config.getint('lcd_width', 480, minval=0, maxval=864)
         self.height = config.getint('lcd_height', 272, minval=0, maxval=480)
-        self.fgcolor = 0x0031
+        self.columns = config.getint('columns', 20, minval=16)
+        self.rows = config.getint('rows', 4, minval=4)
+        self.fgcolor = 0xFFFF
         self.bgcolor = 0x0000
         self.io = i8080overFSMC.I8080overFSMC(config)
-        textframebuffer.TextFrameBuffer.__init__(self, self.io)
+        textframebuffer.TextFrameBuffer.__init__(self, self.io, self.columns, self.rows, self.fgcolor, self.bgcolor)
     def init(self):
         logging.debug("SSD1963.init")
         #REG(0xE2);   // Set PLL 
@@ -76,3 +78,11 @@ class SSD1963(textframebuffer.TextFrameBuffer):
         self.send_cmd(0x2B,[0,0,ey>>8,ey&0xFF])
         self.send_cmd(0x2C)
         self.send_fill(0x0000, self.width * self.height)
+
+    def _fill_into_region(self, x_from, x_to, y_from, y_to, words):
+#        ex= x+(CHAR_WIDTH-1)
+        self.send_cmd(0x2A,[x_from>>8, x_from&0xFF, x_to>>8, x_to&0xFF])
+#        ey= y+(CHAR_HEIGHT-1)
+        self.send_cmd(0x2B,[y_from>>8, y_from&0xFF, y_to>>8, y_to&0xFF])
+        self.send_cmd(0x2C)
+        for d in words: self.send_data(d)

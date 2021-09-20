@@ -12,7 +12,7 @@ CHAR_HEIGHT = 24
 CHAR_WIDTH = 16
 
 class TextFrameBuffer:
-    def __init__(self, io, columns=20, rows=4, fgcolor=0xFFFF, bgcolor=0x0000):
+    def __init__(self, io, columns=16, rows=4, fgcolor=0xFFFF, bgcolor=0x0000):
         self.send_cmd = io.send_cmd
         self.send_data = io.send_data
         self.send_fill = io.send_fill
@@ -50,23 +50,15 @@ class TextFrameBuffer:
         return [ bytearray(row) for row in c_out ]
     def flush(self):
         logging.debug("TFB.flush")
-    def _draw_char(self, x, y, bts):
-        ex= x+(CHAR_WIDTH-1)
-        self.send_cmd(0x2A,[x>>8,x&0xFF,ex>>8,ex&0xFF])
-        ey= y+(CHAR_HEIGHT-1)
-        self.send_cmd(0x2B,[y>>8,y&0xFF,ey>>8,ey&0xFF])
-        self.send_cmd(0x2C)
-        for d in bts:
-            self.send_data(d)
     def write_text(self, x, y, data):
-        if not len(data):
-            return
 #        import pdb; pdb.set_trace()
-#        logging.debug("TFB.write_text x:%d y:%d data(%d):%s:", x, y, len(data), data)
+        if not len(data) or y >= self.rows: return
+        if x + len(data) > self.columns:
+            data = data[:self.columns - min(x, self.columns)]
         cx = x * CHAR_WIDTH
         cy = y * CHAR_HEIGHT
         for c in bytearray(data):
-            self._draw_char(cx, cy, self.font[c])
+            self._fill_into_region(cx, cx+(CHAR_WIDTH-1), cy, cy+(CHAR_HEIGHT-1), self.font[c])
             cx += CHAR_WIDTH
         
     def write_graphics(self, x, y, data):
@@ -74,11 +66,16 @@ class TextFrameBuffer:
         pass
     def write_glyph(self, x, y, glyph_name):
         logging.debug("TFB.write_glyph x:%d y:%d data:%s:", x, y, glyph_name)
-        self._draw_char(x * CHAR_WIDTH, y * CHAR_HEIGHT, self.icons.get(glyph_name))
+        if x >= self.columns or y >= self.rows:
+            return 1
+        self._fill_into_region(x * CHAR_WIDTH, x * CHAR_WIDTH +(CHAR_WIDTH-1),
+                               y * CHAR_HEIGHT, y * CHAR_HEIGHT+(CHAR_HEIGHT-1),
+                               self.icons.get(glyph_name))
         return 1
     def clear(self):
         logging.debug("TFB.clear")
     def get_dimensions(self):
         logging.debug("TFB.get_dimensions")
-        return (self.rows, self.columns)
+#        import pdb; pdb.set_trace()
+        return (self.columns, self.rows)
         
