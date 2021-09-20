@@ -12,12 +12,16 @@ CHAR_HEIGHT = 24
 CHAR_WIDTH = 16
 
 class TextFrameBuffer:
-    def __init__(self, io, columns=20, rows=4):
+    def __init__(self, io, columns=20, rows=4, fgcolor=0xFFFF, bgcolor=0x0000):
         self.send_cmd = io.send_cmd
         self.send_data = io.send_data
         self.send_fill = io.send_fill
         self.columns = columns
         self.rows = rows
+        # [0,31]
+        self.fgcolor = [fgcolor>>8, fgcolor & 0xFF]
+        # [0,0]
+        self.bgcolor = [bgcolor>>8, bgcolor & 0xFF]
         self.vram = [[0x00] * self.columns for i in range(self.rows)]
         # Cache fonts and icons in display byte order
         self.font = [self._swizzle_bits(bytearray(c))
@@ -41,7 +45,7 @@ class TextFrameBuffer:
             c_row = c.pop(0) | c.pop(0)<<8
             ar = []
             for b in format(c_row,'016b'):
-                ar = ar + ([0,31] if b=='1' else [0,0])
+                ar = ar + (self.fgcolor if b=='1' else self.bgcolor)
             c_out.append(ar);
         return [ bytearray(row) for row in c_out ]
     def flush(self):

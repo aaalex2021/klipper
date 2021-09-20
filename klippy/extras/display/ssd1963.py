@@ -19,6 +19,8 @@ class SSD1963(textframebuffer.TextFrameBuffer):
     def __init__(self, config):
         self.width = config.getint('lcd_width', 480, minval=0, maxval=864)
         self.height = config.getint('lcd_height', 272, minval=0, maxval=480)
+        self.fgcolor = 0x0031
+        self.bgcolor = 0x0000
         self.io = i8080overFSMC.I8080overFSMC(config)
         textframebuffer.TextFrameBuffer.__init__(self, self.io)
     def init(self):
