@@ -6,7 +6,6 @@
 
 import time
 import logging
-#import mcu
 from . import textframebuffer
 from . import i8080overFSMC
 
@@ -29,7 +28,6 @@ class SSD1963(textframebuffer.TextFrameBuffer):
                                                  self.width, self.height,
                                                  self.fgcolor, self.bgcolor)
     def init(self):
-        logging.debug("SSD1963.init")
         #REG(0xE2);   // Set PLL 
         #i8080_send_cmd_param8 oid=1 cmd=226 param=170454
         self.io.send_cmd(0xE2,[0x17,0x04,0x54])
@@ -45,9 +43,11 @@ class SSD1963(textframebuffer.TextFrameBuffer):
         #i8080_send_cmd oid=1 cmd=1
         self.io.send_cmd(0x01)
         time.sleep(0.1)
+        # hard coded TFT50 settings
         #REG(0xE6);   // 12Mhz
         #i8080_send_cmd_param8 oid=1 cmd=230 param=013332
         self.io.send_cmd(0xE6,[0x01, 0x33, 0x32])
+        # hard coded TFT50 parameters 480x272 resolution
         #REG(0xB0);   // Set LCD mode
         #i8080_send_cmd_param8 oid=1 cmd=176 param=000001DF010F00
         self.io.send_cmd(0xB0,[0,0,1,0xDF,1,0x0F,0])
@@ -69,12 +69,10 @@ class SSD1963(textframebuffer.TextFrameBuffer):
         #REG(0x36);   // Set address mode
         #i8080_send_cmd_param8 oid=1 cmd=54 param=00
         self.io.send_cmd(0x36,[0])
-
         self.clear_all()
-#        self.io.get_mcu().lookup_command("i8080_fill oid=%c fact=%c", cq=self.io.get_command_queue()).send([self.io.get_oid(), 120])
+
 
     def clear_all(self):
-        logging.debug("SSD1963.clear_all")
         ex= self.width - 1
         self.send_cmd(0x2A,[0,0,ex>>8,ex&0xFF])
         ey= self.height - 1
@@ -83,9 +81,7 @@ class SSD1963(textframebuffer.TextFrameBuffer):
         self.send_fill(0x0000, self.width * self.height)
 
     def _fill_into_region(self, x_from, x_to, y_from, y_to, words):
-#        ex= x+(CHAR_WIDTH-1)
         self.send_cmd(0x2A,[x_from>>8, x_from&0xFF, x_to>>8, x_to&0xFF])
-#        ey= y+(CHAR_HEIGHT-1)
         self.send_cmd(0x2B,[y_from>>8, y_from&0xFF, y_to>>8, y_to&0xFF])
         self.send_cmd(0x2C)
         for d in words: self.send_data(d)
