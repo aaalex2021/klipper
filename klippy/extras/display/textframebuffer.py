@@ -12,15 +12,16 @@ CHAR_HEIGHT = 24
 CHAR_WIDTH = 16
 
 class TextFrameBuffer:
-    def __init__(self, io, columns=16, rows=4, fgcolor=0xFFFF, bgcolor=0x0000):
+    def __init__(self, io, columns=16, rows=4, screen_width=0, screen_height=0,
+                 fgcolor=0xFFFF, bgcolor=0x0000):
         self.send_cmd = io.send_cmd
         self.send_data = io.send_data
         self.send_fill = io.send_fill
         self.columns = columns
         self.rows = rows
-        # [0,31]
+        self.x_offset = (screen_width - CHAR_WIDTH*self.columns) /2
+        self.y_offset = (screen_height - CHAR_HEIGHT*self.rows) /2
         self.fgcolor = [fgcolor>>8, fgcolor & 0xFF]
-        # [0,0]
         self.bgcolor = [bgcolor>>8, bgcolor & 0xFF]
         self.vram = [[0x00] * self.columns for i in range(self.rows)]
         # Cache fonts and icons in display byte order
@@ -55,22 +56,28 @@ class TextFrameBuffer:
         if not len(data) or y >= self.rows: return
         if x + len(data) > self.columns:
             data = data[:self.columns - min(x, self.columns)]
-        cx = x * CHAR_WIDTH
-        cy = y * CHAR_HEIGHT
+        cx = x * CHAR_WIDTH + self.x_offset
+        cy = y * CHAR_HEIGHT + self.y_offset
         for c in bytearray(data):
-            self._fill_into_region(cx, cx+(CHAR_WIDTH-1), cy, cy+(CHAR_HEIGHT-1), self.font[c])
+            self._fill_into_region(cx, cx+(CHAR_WIDTH-1),
+                                   cy, cy+(CHAR_HEIGHT-1),
+                                   self.font[c])
             cx += CHAR_WIDTH
         
     def write_graphics(self, x, y, data):
-#        logging.debug("TFB.write_graphics x:%d y:%d data:%s:", x, y, data)
+        logging.debug("TFB.write_graphics x:%d y:%d data:%s:", x, y, data)
         pass
     def write_glyph(self, x, y, glyph_name):
-        logging.debug("TFB.write_glyph x:%d y:%d data:%s:", x, y, glyph_name)
+#        logging.debug("TFB.write_glyph x:%d y:%d data:%s:", x, y, glyph_name)
         if x >= self.columns or y >= self.rows:
             return 1
-        self._fill_into_region(x * CHAR_WIDTH, x * CHAR_WIDTH +(CHAR_WIDTH-1),
-                               y * CHAR_HEIGHT, y * CHAR_HEIGHT+(CHAR_HEIGHT-1),
-                               self.icons.get(glyph_name))
+        glyph = self.icons.get(glyph_name)
+        if not glyph:
+            return 1
+        cx = x * CHAR_WIDTH + self.x_offset
+        cy = y * CHAR_HEIGHT + self.y_offset
+        self._fill_into_region(cx, cx+(CHAR_WIDTH-1), cy, cy+(CHAR_HEIGHT-1),
+                               glyph)
         return 1
     def clear(self):
         logging.debug("TFB.clear")

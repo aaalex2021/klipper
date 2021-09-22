@@ -24,7 +24,10 @@ class SSD1963(textframebuffer.TextFrameBuffer):
         self.fgcolor = 0xFFFF
         self.bgcolor = 0x0000
         self.io = i8080overFSMC.I8080overFSMC(config)
-        textframebuffer.TextFrameBuffer.__init__(self, self.io, self.columns, self.rows, self.fgcolor, self.bgcolor)
+        textframebuffer.TextFrameBuffer.__init__(self, self.io,
+                                                 self.columns, self.rows,
+                                                 self.width, self.height,
+                                                 self.fgcolor, self.bgcolor)
     def init(self):
         logging.debug("SSD1963.init")
         #REG(0xE2);   // Set PLL 
