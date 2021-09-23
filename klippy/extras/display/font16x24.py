@@ -11,7 +11,7 @@
 #
 # Font comes from  basti79/LCD-fonts  found at:
 # https://github.com/basti79/LCD-fonts/blob/master/16x26_horizontal_LSB_1.h
-# (c)  basti79 
+# (c)  basti79
 #
 # Indivdual fonts are public domain
 ######################################################################

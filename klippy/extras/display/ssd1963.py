@@ -28,7 +28,7 @@ class SSD1963(textframebuffer.TextFrameBuffer):
                                                  self.width, self.height,
                                                  self.fgcolor, self.bgcolor)
     def init(self):
-        #REG(0xE2);   // Set PLL 
+        #REG(0xE2);   // Set PLL
         #i8080_send_cmd_param8 oid=1 cmd=226 param=170454
         self.io.send_cmd(0xE2,[0x17,0x04,0x54])
         #REG(0xE0);   // Start PLL command
