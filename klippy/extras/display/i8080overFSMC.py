@@ -16,13 +16,15 @@ class I8080overFSMC:
         printer = config.get_printer()
         self.mcu = mcu.get_printer_mcu(printer, config.get('fsmc_mcu', 'mcu'))
         ppins = printer.lookup_object("pins")
-        cs_pin_param = ppins.lookup_pin(config.get('fsmc_cs_pin'), share_type=None)
+        cs_pin_param = ppins.lookup_pin(config.get('fsmc_cs_pin'),
+                                        share_type=None)
         self.cs_pin = cs_pin_param['pin']
-        rs_pin_param = ppins.lookup_pin(config.get('fsmc_rs_pin'), share_type=None)
+        rs_pin_param = ppins.lookup_pin(config.get('fsmc_rs_pin'),
+                                        share_type=None)
         self.rs_pin = rs_pin_param['pin']
         if cs_pin_param['chip'] != self.mcu or rs_pin_param['chip'] != self.mcu:
-            raise ppins.error("%s: fsmc pins must be on same mcu" % (config.get_name(),))
-        
+            raise ppins.error("%s: fsmc pins must be on same mcu" %
+                              (config.get_name(),))
         self.oid = self.mcu.create_oid()
         self.config_fmt = ("config_i8080 oid=%d" % self.oid)
         self.cmd_queue = self.mcu.alloc_command_queue()
@@ -44,18 +46,16 @@ class I8080overFSMC:
              "i8080_send_data16 oid=%c data=%*s", cq=self.cmd_queue)
         self.i8080_send_fill_cmd = self.mcu.lookup_command(
              "i8080_send_fill oid=%c color=%c count=%c", cq=self.cmd_queue)
-        
+
     def send_data(self, data):
-#        logging.debug("I8080overFSMC.send_data:%r", repr(data))
         self.i8080_send_data16_cmd.send([self.oid, data])
 
     def send_cmd(self, cmd, param=[]):
-#        logging.debug("I8080overFSMC send_cmd:%d %s", cmd, repr(param))
         if not param:
             self.i8080_send_cmd_cmd.send([self.oid, cmd])
         else:
-            self.i8080_send_cmd_param8_cmd.send([self.oid, cmd, bytearray(param)])
+            self.i8080_send_cmd_param8_cmd.send([self.oid, cmd,
+                                                 bytearray(param)])
 
     def send_fill(self, color, count):
-#        logging.debug("I8080overFSMC.send_fill:%d :%d", color, count)
         self.i8080_send_fill_cmd.send([self.oid, color, count])
