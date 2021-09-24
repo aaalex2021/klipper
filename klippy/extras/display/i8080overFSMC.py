@@ -5,13 +5,10 @@
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #import pdb
 
-import logging
 import mcu
 
 class I8080overFSMC:
     def __init__(self, config):
-        logging.info("I8080overFSMC __init__")
-
         # Determine FSMC control pins from config
         printer = config.get_printer()
         self.mcu = mcu.get_printer_mcu(printer, config.get('fsmc_mcu', 'mcu'))
@@ -36,7 +33,6 @@ class I8080overFSMC:
     def get_command_queue(self):
         return self.cmd_queue
     def build_config(self):
-        logging.debug("I8080overFSMC build_config")
         self.mcu.add_config_cmd(self.config_fmt)
         self.i8080_send_cmd_cmd = self.mcu.lookup_command(
             "i8080_send_cmd oid=%c cmd=%c", cq=self.cmd_queue)

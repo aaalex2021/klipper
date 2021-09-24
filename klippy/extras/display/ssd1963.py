@@ -5,7 +5,6 @@
 # This file may be distributed under the terms of the GNU GPLv3 license.
 
 import time
-import logging
 from . import textframebuffer
 from . import i8080overFSMC
 
