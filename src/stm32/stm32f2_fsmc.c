@@ -1,7 +1,6 @@
 // STM32F2 FSMC support
 //
-// Copyright (C) 2019  Kevin O'Connor <kevin@koconnor.net>
-// Copyright (C) 2021  Alex Peuchert  <aaalex2021@ki2s.com>
+// Copyright (C) 2021  Kevin O'Connor <kevin@koconnor.net>
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 
@@ -21,6 +20,9 @@ typedef struct
 } i8080_access_struct;
 
 i8080_access_struct *i8080_access;
+
+DECL_CONSTANT_STR("RESERVE_PINS_FSMC", "PD0,PD1,PD8,PD9,PD10,PD14,PD15,PE7," \
+                  "PE8,PE9,PE10,PE11,PE12,PE13,PE14,PE15,PD4,PD5");
 
 void enable_i8080_fsmc(uint32_t cs_pin, uint32_t rs_pin, uint8_t dstime)
 {

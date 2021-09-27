@@ -13,12 +13,15 @@ class I8080overFSMC:
         printer = config.get_printer()
         self.mcu = mcu.get_printer_mcu(printer, config.get('fsmc_mcu', 'mcu'))
         ppins = printer.lookup_object("pins")
+        pin_resolver = ppins.get_pin_resolver(self.mcu.get_name())
         cs_pin_param = ppins.lookup_pin(config.get('fsmc_cs_pin'),
                                         share_type=None)
         self.cs_pin = cs_pin_param['pin']
+        pin_resolver.reserve_pin(self.cs_pin,"FSMC")
         rs_pin_param = ppins.lookup_pin(config.get('fsmc_rs_pin'),
                                         share_type=None)
         self.rs_pin = rs_pin_param['pin']
+        pin_resolver.reserve_pin(self.rs_pin,"FSMC")
         if cs_pin_param['chip'] != self.mcu or rs_pin_param['chip'] != self.mcu:
             raise ppins.error("%s: fsmc pins must be on same mcu" %
                               (config.get_name(),))
