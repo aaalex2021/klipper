@@ -68,9 +68,10 @@ class TextFrameBuffer:
                     chx = self.icons.get(ch)
                 else:
                     chx = self.font[ord(ch)]
-                self._fill_into_region(cx, cx+(CHAR_WIDTH-1),
-                                       cy, cy+(CHAR_HEIGHT-1),
-                                       chx)
+                if chx:
+                    self._fill_into_region(cx, cx+(CHAR_WIDTH-1),
+                                           cy, cy+(CHAR_HEIGHT-1),
+                                           chx)
         self.tbuf_old = self.tbuf
     def write_text(self, x, y, data):
         if not len(data) or y >= self.rows: return
