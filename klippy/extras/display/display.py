@@ -6,7 +6,7 @@
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 import logging, os, ast
-from . import hd44780, hd44780_spi, st7920, uc1701, menu
+from . import hd44780, hd44780_spi, st7920, uc1701, ssd1963, ili9488, menu
 
 # Normal time between each screen redraw
 REDRAW_TIME = 0.500
